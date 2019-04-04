@@ -2,6 +2,7 @@
 #define _YAS_AVR_SETTINGS_
 
 #define YAS_MAX_TASKS 10
-
+#define YAS_MAX_STACK 100
+#define YAS_TIMER_VALUE 255
 
 #endif

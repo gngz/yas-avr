@@ -6,7 +6,7 @@
 
 # Project Configs
 
-TARGET = main
+TARGET = yas-bin
 SERIAL = COM3
 BAUD = 57600 
 DEVICE = atmega328p
@@ -16,7 +16,7 @@ CLOCK = 16000000
 
 YAS-CFILES = main.c
 HEADER-LOC = yas/includes
-
+HEADER-LOC += -I drivers/includes
 # Compiler UTILS
 
 CC = avr-gcc
@@ -25,7 +25,7 @@ OBJCOPY= avr-objcopy
 SIZE= avr-size
 
 
-CFLAGS = -Wall -g  -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -I $(HEADER-LOC) #-o $(TARGET).bin $(C-FILES)
+CFLAGS = -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -I $(HEADER-LOC)
 
 AVRDUDE = avrdude -c arduino -p $(DEVICE) -P $(SERIAL) -b $(BAUD) -U flash:w:..\bin\$(TARGET).hex:i
 
@@ -35,11 +35,15 @@ COMPILE = $(CC) $(CC-FLAGS)
 
 
 
-all: compile-os compile genbin genhex
+all: compile-os compile-drivers compile genbin genhex
 
 
 
 compile-os: yas/*.c
+	$(CC) $(CFLAGS) -c $^
+	mv -t ../obj *.o
+
+compile-drivers: drivers/*.c
 	$(CC) $(CFLAGS) -c $^
 	mv -t ../obj *.o
 
@@ -48,7 +52,7 @@ compile: *.c
 	mv -t ../obj *.o
 
 genbin:	
-	$(CC) -o ../bin/$(TARGET).bin ../obj/*.o
+	$(CC) -mmcu=atmega328p -o ../bin/$(TARGET).bin ../obj/*.o
 
 genhex: ../bin/$(TARGET).bin
 	${OBJCOPY} -j .text -j .data -O ihex ..\bin\${TARGET}.bin ..\bin\${TARGET}.hex

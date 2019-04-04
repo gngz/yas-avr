@@ -1,28 +1,43 @@
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#include <yas.h>
+#include <uart.h>
 
-/***********************************************************************
-Example - Blink an LED connected to PORTC_5
-Note - Connect a LED at PORTC_5 and flash it at a particular interval.
-Here LED is connected in sinking mode Logic1 -> LED Off
-Logic0 -> LED On
-************************************************************************/
 
-#include<avr/io.h>       // Header file for basic avr input/output
-#include<util/delay.h>   // header file for delay generation
-#define BV(x) (1<<x)     // See text below
 
-int help();
 
 int main(void)
 {
-    DDRB=0xFF;      // PORTC declared as output
-    PORTB=0xFF;     // PORTC is initially high to off the led initially
-    while(1==1)     // infinite loop as 1 is always equals 1
-    {
-        PORTB=~(BV(5));     // led glow here, Making 5th bit of PORTC LOW
-        _delay_ms(help());    // one second delay
-        PORTB=BV(5);        // led do not glow here
-        _delay_ms(help());
+    DDRB=0xFF;
+    PORTB=0x00;
+    
+    yas_init();
+    
+    yas_uart_init(9600);
+    yas_uart_sendstring("hello!");
+
+    unsigned char str [20];
+    SREG = 0;
+    itoa(SREG,str,2);
+    yas_uart_sendstring(str);
+
+
+    sei();
+ 
+
+    while(1){ 
+
+       itoa(SREG,str,2);
+    yas_uart_sendstring("SREG:");
+    yas_uart_sendstring(str);
+    yas_uart_sendchar('\n');
+    _delay_ms(1000);
+
     }
+  
     return 0;
 
 }
+
+
